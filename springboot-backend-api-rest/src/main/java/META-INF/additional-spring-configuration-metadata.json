@@ -1,0 +1,17 @@
+{"properties": [
+  {
+    "name": "texto.indexcontoller.titulo.index",
+    "type": "java.lang.String",
+    "description": "A description for 'texto.indexcontoller.titulo.index'"
+  },
+  {
+    "name": "texto.indexcontoller.titulo.perfil",
+    "type": "java.lang.String",
+    "description": "A description for 'texto.indexcontoller.titulo.perfil'"
+  },
+  {
+    "name": "texto.indexcontoller.titulo.listar",
+    "type": "java.lang.String",
+    "description": "A description for 'texto.indexcontoller.titulo.listar'"
+  }
+]}
