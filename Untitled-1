@@ -1,0 +1,34 @@
+sb.append(" Select fecha, servidor, banco, aduana, nm_archivo, hr_envio, \n ");
+						sb.append(" case \n ");
+						sb.append(" when accion = '1' then 'TRANSMITIDO' \n ");
+						sb.append(" when accion = '2' then 'ERROR' \n ");
+						sb.append(" when accion = '3' then 'RECIBIDO' \n ");
+						sb.append(" end \n ");
+						sb.append(" AS movimiento,  \n ");
+						sb.append(" case \n ");
+						sb.append(" when acuse1='0' then 'Header se transmitio con exito' \n ");
+						sb.append(" when acuse1='1' then 'El dia juliano es incorrecto' \n ");
+						sb.append(" when acuse1='2' then 'El archivo que desea enviar ya existe' \n ");
+						sb.append(" when acuse1='3' then 'Header con longitud no valida' \n ");
+						sb.append(" when acuse1='4' then 'Clave de banco no valida' \n ");
+						sb.append(" when acuse1='5' then 'Clave de aduana/seccion no valida' \n ");
+						sb.append(" when acuse1='6' then 'Clave de validador no valida' \n ");
+						sb.append(" when acuse1='7' then 'Tipo de archivo no existe' \n ");
+						sb.append(" when acuse1='-1' then 'Error desconocido' \n ");
+						sb.append(" end  \n ");
+						sb.append(" as acus1, \n ");
+						sb.append(" case \n ");
+						sb.append(" when acuse2='0' then'El archivo se transmitio con exito' \n ");
+						sb.append(" when acuse2='1' then'El tamano transmitido difiere del especificado' \n ");
+						sb.append(" when acuse2='-1' then'Error desconocido' \n ");
+						sb.append(" end \n ");
+						sb.append(" as acus2 \n ");
+						sb.append(" from " +ACCESOS.DB_PRINCIPAL+".info_envio_pago  where fecha BETWEEN '"+f_inicio+"' AND '"+f_fin+"'   and nm_Archivo like '%"+d_archivo+"%'; \n ");
+
+
+                        INSERT INTO `dbsaai`.`cs_contribucion_forma_pago` (`d_clave_doc`, `d_tipo_operacion`, `n_contribucion`, `n_forma_pago`, `f_ini_vig`, `f_fin_vig`, `b_activo`) VALUES ('A1', '1', '23', '0', '2019-11-25', '2100-12-31', '1');
+UPDATE `dbsaai`.`cs_contribucion_forma_pago` SET `f_fin_vig` = '2019-11-24' WHERE (`c_contribucion_forma_pago` = '44');
+DELETE FROM `dbsaai`.`cs_contribucion_forma_pago` WHERE (`c_contribucion_forma_pago` = '2074');
+
+
+tail -10000 /var/log/vsftpd.log | grep "userCandE" | grep "* c"

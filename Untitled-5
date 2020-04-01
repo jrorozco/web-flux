@@ -1,0 +1,41 @@
+/**	TODO
+     * Envia mail de ioException..
+     * **/
+    public void enviar(String destino, String texto, String Asunto )
+    {
+        try
+        {
+            setPropsReportes("IOException");
+            Properties props = new Properties();
+            props.setProperty("mail.smtp.host", smtp);
+            props.setProperty("mail.smtp.port", port);
+            
+            props.setProperty("mail.smtp.auth", "true");
+            props.put("mail.smtp.starttls.enable", "true");
+            props.setProperty("mail.smtp.localhost", "127.0.0.1");
+            // Preparamos la sesion
+            Session session = Session.getDefaultInstance(props);
+            
+
+            // Construimos el mensaje
+            MimeMessage message = new MimeMessage(session);
+            message.setFrom(new InternetAddress(user));
+            message.addRecipients( Message.RecipientType.TO, destino);
+            message.setSubject(Asunto);
+            message.setText(texto);
+            
+            
+            // Lo enviamos.
+            Transport t = session.getTransport("smtp");
+            t.connect(smtp, user, password);
+            t.sendMessage(message, message.getAllRecipients());
+            
+
+            // Cierre.
+            t.close();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }

@@ -1,0 +1,424 @@
+public void Master(String[] strLstLinea, int pc_guia_master, String pn_guia_master, String pf_procesamiento, Vuelo vueloOrigen, Vuelo vueloDestino, int pc_tipo_mov, String strFechaVuelo, String CAAT, String RFC) throws Exception
+	{
+		TransformaAXML transAXML = new TransformaAXML();
+		ValidaXML validaXML = new ValidaXML();
+		List<String> lstStrXMLEncode = new ArrayList<String>();
+		ManifiestoCliente manCliente = new ManifiestoCliente();
+		String d_xml_resp_envio = "";
+		EjecutaSQL ejecutaSQL = new EjecutaSQL();
+		String strd_xml_envio = "";
+		boolean bolValidaXML = false;
+		Utils utils= new Utils();
+
+		try { // try para realizar y validar el XML	
+			strd_xml_envio = transAXML.doGuiaMasterXML(strLstLinea, pc_guia_master, pn_guia_master, vueloOrigen, vueloDestino, pc_tipo_mov, strFechaVuelo,CAAT);			
+			bolValidaXML = validaXML.validarGuiaMasterXML(pc_guia_master, strd_xml_envio);						
+			byte[] byteXMLEncode = Base64.encodeBase64(strd_xml_envio.getBytes());
+			String strXMLEncode = new String(byteXMLEncode, "UTF-8");
+			lstStrXMLEncode.add(strXMLEncode);
+		} // try para realizar y validar el XML 	
+		catch (Exception er) {
+			er.printStackTrace();
+			//throw new Exception("Error al formar o validar el archivo XML house : " + er.toString()+ "\n");							
+		}
+		
+		try {
+			ejecutaSQL.actualizaDatosEnvioMaster(pc_guia_master, strd_xml_envio);
+		}
+		catch (SQLException er) {
+			er.printStackTrace();
+			//throw new Exception("Error al actualizar los datos de la guia master : " + er.toString() + "\n");	
+		}
+		
+		try { // try para consumir el Servicio Web
+			d_xml_resp_envio = manCliente.consumirServicio(lstStrXMLEncode, RFC);
+			guardarAcuseMaster(pc_guia_master, d_xml_resp_envio);
+		} // try para consumir el Servicio Web
+		catch (Exception er) {
+			er.printStackTrace();
+			//throw new Exception("Error al consumir el Servicio Web.  : " + er.toString()+ "\n");							
+		}
+		
+		try {
+			ejecutaSQL.actualizaDatosEnvioRespMaster(pc_guia_master, d_xml_resp_envio);
+		}
+		catch (SQLException er) {
+			er.printStackTrace();
+			//throw new Exception("Error al actualizar los datos de la guia master : " + er.toString() + "\n");	
+		}
+	}
+	
+	
+	public void MasterDelete (int pc_guia_master, String pd_xml_envio, String CAAT, String RFC) throws Exception
+	{	
+		ValidaXML validaXML = new ValidaXML();
+		List<String> lstStrXMLEncode = new ArrayList<String>();
+		ManifiestoCliente manCliente = new ManifiestoCliente();
+		String d_xml_resp_envio = "";
+		EjecutaSQL ejecutaSQL = new EjecutaSQL();
+		boolean bolValidaXML = false;
+
+		try {  			
+			bolValidaXML = validaXML.validarGuiaMasterXML(/*pCon,*/ pc_guia_master, pd_xml_envio);
+			byte[] byteXMLEncode = Base64.encodeBase64(pd_xml_envio.getBytes());
+			String strXMLEncode = new String(byteXMLEncode, "UTF-8");
+			lstStrXMLEncode.add(strXMLEncode);
+		}  
+		catch (Exception er) {
+			er.printStackTrace();
+			//throw new Exception("Error al formar o validar el archivo XML house : " + er.toString()+ "\n");						
+		}
+		
+		
+		try {
+			ejecutaSQL.actualizaDatosEnvioMaster(pc_guia_master, pd_xml_envio);
+		}
+		catch (SQLException er) {
+			er.printStackTrace();
+			//throw new Exception("Error al actualizar los datos de la guia master : " + er.toString() + "\n");	
+		}
+		
+		try { // try para consumir el Servicio Web
+			d_xml_resp_envio = manCliente.consumirServicio(lstStrXMLEncode, RFC);
+			guardarAcuseMaster(pc_guia_master, d_xml_resp_envio);
+		} // try para consumir el Servicio Web
+		catch (Exception er) {
+			er.printStackTrace();
+			//throw new Exception("Error al consumir el Servicio Web.  : " + er.toString()+ "\n");						
+		}
+		
+		try {
+			ejecutaSQL.actualizaDatosEnvioRespMaster(pc_guia_master, d_xml_resp_envio);
+		}
+		catch (SQLException er) {
+			er.printStackTrace();
+			//throw new Exception("Error al actualizar los datos del manifiesto : " + er.toString() + "\n");	
+		}								
+	}
+	
+	
+	public void Manifiesto(String pn_vuelo, int pc_manifiesto, String pn_manifiesto, ArrayList ArrayMaster, String pf_procesamiento, Vuelo pvo, Vuelo pvd, int pc_tipo_mov, String strFechaVuelo,String CAAT, String RFC) throws Exception
+	{	
+		TransformaAXML transAXML = new TransformaAXML();
+		ValidaXML validaXML = new ValidaXML();
+		List<String> lstStrXMLEncode = new ArrayList<String>();
+		ManifiestoCliente manCliente = new ManifiestoCliente();
+		String d_xml_resp_envio = "";
+		EjecutaSQL ejecutaSQL = new EjecutaSQL();
+		String strd_xml_envio = "";
+		boolean bolValidaXML = false;
+		Utils utils= new Utils();
+
+		try { // try para realizar y validar el XML
+			strd_xml_envio = transAXML.doManifiestoXML(pn_vuelo, pc_manifiesto, pn_manifiesto, ArrayMaster, pvo, pvd, pc_tipo_mov, strFechaVuelo, CAAT);			
+			bolValidaXML = validaXML.validarManifiestoXML(/*pCon,*/ pc_manifiesto, strd_xml_envio);								
+			byte[] byteXMLEncode = Base64.encodeBase64(strd_xml_envio.getBytes());
+			String strXMLEncode = new String(byteXMLEncode, "UTF-8");
+			lstStrXMLEncode.add(strXMLEncode);
+		} // try para realizar y validar el XML 	
+		catch (Exception er) {
+			er.printStackTrace();
+			//throw new Exception("Error al formar o validar el archivo XML house : " + er.toString()+ "\n");						
+		}
+
+		try {
+			ejecutaSQL.actualizaDatosEnvioManifiesto(pc_manifiesto, strd_xml_envio);
+		}
+		catch (SQLException er) {
+			er.printStackTrace();
+			//throw new Exception("Error al actualizar los datos del manifiesto : " + er.toString() + "\n");	
+		}
+		
+		try { // try para consumir el Servicio Web
+			d_xml_resp_envio = manCliente.consumirServicio(lstStrXMLEncode, RFC);	
+			guardarAcuseManifiesto(pc_manifiesto, d_xml_resp_envio);//Guardamo el acuse 1 del manifiesto en la tabla -> mvucem.acuse_manifiesto
+		} // try para consumir el Servicio Web
+		catch(com.ctc.wstx.exc.WstxIOException e) {
+			
+			
+			//cambiado para que inserte el email, en lugar de mandarlo 
+			
+			InsertEmailErrorCert(pc_manifiesto, pn_manifiesto, "Error : favor de verificar el Certificado -> " + e.getMessage());
+
+			//end cambio
+			
+			//enviarEmailErrorCert(pc_manifiesto, pn_manifiesto, "Error : favor de verificar el Certificado -> " + e.getMessage());
+		}
+		catch (Exception er) {
+			er.printStackTrace();
+			//throw new Exception("Error al consumir el Servicio Web.  : " + er.toString()+ "\n");						
+		}
+		
+		try {
+			ejecutaSQL.actualizaDatosEnvioRespManifiesto(pc_manifiesto, d_xml_resp_envio);
+		}
+		catch (SQLException er) {
+			er.printStackTrace();
+			//throw new Exception("Error al actualizar los datos del manifiesto : " + er.toString() + "\n");	
+		}	
+	}
+	
+	
+	public void ManifiestoDelete (int pc_manifiesto, String pd_xml_envio , String CAAT, String RFC) throws Exception
+	{	
+		ValidaXML validaXML = new ValidaXML();
+		List<String> lstStrXMLEncode = new ArrayList<String>();
+		ManifiestoCliente manCliente = new ManifiestoCliente();
+		String d_xml_resp_envio = "";
+		EjecutaSQL ejecutaSQL = new EjecutaSQL();
+		boolean bolValidaXML = false;
+
+		try {  			
+			bolValidaXML = validaXML.validarManifiestoXML(pc_manifiesto, pd_xml_envio);
+			byte[] byteXMLEncode = Base64.encodeBase64(pd_xml_envio.getBytes());
+			String strXMLEncode = new String(byteXMLEncode, "UTF-8");
+			lstStrXMLEncode.add(strXMLEncode);
+		}  
+		catch (Exception er) {
+			er.printStackTrace();
+			//throw new Exception("Error al formar o validar el archivo XML house : " + er.toString()+ "\n");						
+		}
+		
+		try {
+			ejecutaSQL.actualizaDatosEnvioManifiesto(pc_manifiesto, pd_xml_envio);
+		}
+		catch (SQLException er) {
+			er.printStackTrace();
+			//throw new Exception("Error al actualizar los datos del manifiesto : " + er.toString() + "\n");	
+		}
+		
+		try { // try para consumir el Servicio Web
+			d_xml_resp_envio = manCliente.consumirServicio(lstStrXMLEncode, RFC);
+			guardarAcuseManifiesto(pc_manifiesto, d_xml_resp_envio);//Guardamo el acuse 1 del manifiesto en la tabla -> mvucem.acuse_manifiesto
+		} // try para consumir el Servicio Web
+		catch (Exception er) {
+			er.printStackTrace();
+			//throw new Exception("Error al consumir el Servicio Web.  : " + er.toString()+ "\n");						
+		}
+		
+		try {
+			ejecutaSQL.actualizaDatosEnvioRespManifiesto(pc_manifiesto, d_xml_resp_envio);
+		}
+		catch (SQLException er) {
+			er.printStackTrace();
+			//throw new Exception("Error al actualizar los datos del manifiesto : " + er.toString() + "\n");	
+		}								
+	}
+	
+	
+	public static void guardarAcuseManifiesto(int guia, String xml)
+	{
+		EjecutaSQL sql = new EjecutaSQL();
+		int error=0;
+		int id_peticion=0;
+		String descripcion_error="";
+		String estado="";
+//		System.out.println("XML -> " +  xml);
+	    String[] tempo = xml.split("\n");
+	    
+	    for(int i =0; i< tempo.length; i++)
+	    {
+//	    		System.out.println("VECTOR -> ["+i+"] ->" + tempo[i]);
+	    }
+	    byte[] byteArray=tempo[5].toString().getBytes();
+	    
+	    try {
+			
+	    		Document XMLDoc =  DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new ByteArrayInputStream(byteArray ) );
+//	    		Document XMLDoc =  DocumentBuilderFactory.newInstance().newDocumentBuilder().parse("/tempo/EjemploXmlRespuesta.xml" );
+			XMLDoc.getDocumentElement().normalize();
+//			System.out.println("Node -> " + XMLDoc.getDocumentElement().getNodeName());
+			NodeList nList = XMLDoc.getElementsByTagName("S:Header");
+			for(int temp=0; temp<nList.getLength(); temp++)
+			{
+				Node nNode = nList.item(temp);
+//				System.out.println("\nCurrent Element :" + nNode.getNodeName());
+				if (nNode.getNodeType() == Node.ELEMENT_NODE) 
+				{
+					Element eElement =(Element) nNode;
+					id_peticion=Integer.parseInt(eElement.getElementsByTagName("ID_PETICION").item(0).getTextContent().trim());
+//					System.out.println(eElement.getElementsByTagName("wsu:Created").item(0).getTextContent());
+//					System.out.println(eElement.getElementsByTagName("wsu:Expires").item(0).getTextContent());
+				}
+			}
+			NodeList nListBOdy = XMLDoc.getElementsByTagName("S:Body");
+			for(int tempBOdy=0; tempBOdy< nListBOdy.getLength(); tempBOdy++)
+			{
+				Node nNodeBody = nListBOdy.item(tempBOdy);
+//				System.out.println("\nCurrent Element :" + nNodeBody.getNodeName());
+				if (nNodeBody.getNodeType() == Node.ELEMENT_NODE) 
+				{
+					Element eElementBody =(Element) nNodeBody;
+					if(!eElementBody.getElementsByTagName("estado").item(0).getTextContent().trim().equals("true"))
+					{
+						error=1;
+						descripcion_error=eElementBody.getElementsByTagName("error").item(0).getTextContent().trim();
+					}
+					estado=eElementBody.getElementsByTagName("estado").item(0).getTextContent().trim();
+//					System.out.println(error);
+				}
+			}					
+//			//public void insertaAcuseManifiesto (int pc_manifiesto, int error, String id_peticion,String estado, String descripcion
+			try {
+				sql.insertaAcuseManifiesto(guia,error,id_peticion,estado,descripcion_error);
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			if (error==1)
+			{
+				//enviarEmailError(guia, "Manifiesto",descripcion_error,id_peticion);
+				//metodo para insertar el mail con error
+				InsertEmailError(guia, "Manifiesto",descripcion_error,id_peticion);
+			}
+			
+		
+		} catch (SAXException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ParserConfigurationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	
+	}
+	
+	public static void guardarAcuseMaster(int guia, String xml)
+	{
+		EjecutaSQL sql = new EjecutaSQL();
+		int error=0;
+		int id_peticion=0;
+		String descripcion_error="";
+		String estado="";
+	    String[] tempo = xml.split("\n");
+	   //System.out.println(tempo[4]);
+	    for(int i =0; i< tempo.length; i++)
+	    {
+	    		//System.out.println("VECTOR -> ["+i+"] ->" + tempo[i]);
+	    }
+	    byte[] byteArray=tempo[5].toString().getBytes();
+	    
+	    try {
+			
+	    		Document XMLDoc =  DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new ByteArrayInputStream(byteArray ) );
+//	    		Document XMLDoc =  DocumentBuilderFactory.newInstance().newDocumentBuilder().parse("/tempo/EjemploXmlRespuesta.xml" );
+			XMLDoc.getDocumentElement().normalize();
+			//System.out.println("Node -> " + XMLDoc.getDocumentElement().getNodeName());
+			NodeList nList = XMLDoc.getElementsByTagName("S:Header");
+			for(int temp=0; temp<nList.getLength(); temp++)
+			{
+				Node nNode = nList.item(temp);
+//				System.out.println("\nCurrent Element :" + nNode.getNodeName());
+				if (nNode.getNodeType() == Node.ELEMENT_NODE) 
+				{
+					Element eElement =(Element) nNode;
+					id_peticion=Integer.parseInt(eElement.getElementsByTagName("ID_PETICION").item(0).getTextContent().trim());
+//					System.out.println(eElement.getElementsByTagName("wsu:Created").item(0).getTextContent());
+//					System.out.println(eElement.getElementsByTagName("wsu:Expires").item(0).getTextContent());
+				}
+			}
+			NodeList nListBOdy = XMLDoc.getElementsByTagName("S:Body");
+			for(int tempBOdy=0; tempBOdy< nListBOdy.getLength(); tempBOdy++)
+			{
+				Node nNodeBody = nListBOdy.item(tempBOdy);
+//				System.out.println("\nCurrent Element :" + nNodeBody.getNodeName());
+				if (nNodeBody.getNodeType() == Node.ELEMENT_NODE) 
+				{
+					Element eElementBody =(Element) nNodeBody;
+					if(!eElementBody.getElementsByTagName("estado").item(0).getTextContent().trim().equals("true"))
+					{
+						error=1;
+						descripcion_error=eElementBody.getElementsByTagName("error").item(0).getTextContent().trim();
+					}
+					estado=eElementBody.getElementsByTagName("estado").item(0).getTextContent().trim();
+//					System.out.println(error);
+				}
+			}					
+			//public void insertaAcuseManifiesto (int pc_manifiesto, int error, String id_peticion,String estado, String descripcion
+			try {
+				sql.insertaAcuseMaster(guia,error,id_peticion,estado,descripcion_error);
+				String guia_master = sql.getMasterById(guia);
+				
+				Utils.crearArchivoPrimerAcusePorGuia(guia_master, error, id_peticion, estado, descripcion_error);
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			if (error==1)
+			{
+				//enviarEmailError(guia, "Master",descripcion_error,id_peticion);
+				//cambio para insert
+				InsertEmailError(guia, "Master",descripcion_error,id_peticion);
+			}
+		
+		} catch (SAXException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ParserConfigurationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	
+	}
+	
+	public static void enviarEmailError(int guia, String master_manifiesto, String descripcion_error,int  id_peticion)
+	{
+		Mail mail= new Mail();
+		SimpleDateFormat sdf = new SimpleDateFormat("hh:mm:ss");
+		String hoy = sdf.format( new Date() );
+		mail.setPropsReportes("Error Manifiesto Volaris ");
+		mail.setSubject("Errores : "+ master_manifiesto +"  "+guia);
+		mail.setText("\n"+ master_manifiesto + " : "+ guia +"\nId_Peticion : "+id_peticion+"\nError : "+ descripcion_error);
+		mail.setTo("sistemas@alvaroquintana.com");
+		mail.send();
+		
+	}
+		
+	public static void enviarEmailErrorCert(int guia, String master_manifiesto,String descripcion_error)
+	{
+		Mail mail= new Mail();
+		SimpleDateFormat sdf = new SimpleDateFormat("hh:mm:ss");
+		String hoy = sdf.format( new Date() );
+		mail.setPropsReportes("Error Manifiesto Volaris ");
+		mail.setSubject("Errores : "+ master_manifiesto +"  "+guia);
+		mail.setText("\n"+ master_manifiesto + " : "+ guia +"\nHora : "+hoy+"\nError : "+ descripcion_error);
+		mail.setTo("sistemas@alvaroquintana.com");
+		mail.send();
+	}
+
+	//agregar métodos para que los mails se inserten 
+	@SuppressWarnings("static-access")
+	public static void InsertEmailErrorCert(int guia, String master_manifiesto,String descripcion_error)
+	{
+		try{
+			SimpleDateFormat sdf = new SimpleDateFormat("hh:mm:ss");
+			String hoy = sdf.format( new Date() );
+			String textoMail="\n"+ master_manifiesto + " : "+ guia +"\nHora : "+hoy+"\nError : "+ descripcion_error;
+			InsertMails.registrarMail("Manifiestos Volaris", "Error Manifiesto Volaris - AQ", "Errores : "+ master_manifiesto +"  "+guia, "sistemas@alvaroquintana.com"
+										, null, null, textoMail, 0, 0);
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+	}
+	
+	//método dos para insert
+	@SuppressWarnings("static-access")
+	public static void InsertEmailError(int guia, String master_manifiesto, String descripcion_error,int  id_peticion)
+	{
+		try{
+			SimpleDateFormat sdf = new SimpleDateFormat("hh:mm:ss");
+			String hoy = sdf.format( new Date() );
+			String textoMail="\n"+ master_manifiesto + " : "+ guia +"\nId_Peticion : "+id_peticion+"\nError : "+ descripcion_error;
+			InsertMails.registrarMail("Manifiestos Volaris", "Error Manifiesto Volaris - AQ", "Errores : "+ master_manifiesto +"  "+guia, "sistemas@alvaroquintana.com"
+										, null, null, textoMail, 0, 0);
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		
+	}

@@ -1,0 +1,70 @@
+ SELECT ob.c_asociacion, ob.cv_cliente, ob.nm_archivo, ori.pedimento, c.d_rfc, c.d_alias, CONCAT(u.d_usuario, '-', u.d_nombre, ' ', u.d_ape_paterno) as cv_usuario, a.d_aduana, b.desc_banco, r.rfc, ob.nu_pedimentos, ob.fe_envio, ob.hh_envio, r.hora, r.nm_archivo as nm_archivo_respuesta,  r.cve_error, r.firma, 
+		 concat(a.d_aduana,'(',ob.c_asociacion,')') as ciudad, a.n_aduanac,ob.cv_patente, 
+		  if(r.hora is not null ,sec_to_time(timestampdiff(second,ob.hh_envio,r.hora )) ,'00:00:00' )espera ,ori.cve_doc, ori.pedimento  
+		 ,  CASE  
+		   WHEN ob.accion ='0' THEN 'RECIBIDO' 
+		   WHEN ob.accion ='1' THEN 'PREVALIDANDO' 
+		  WHEN ob.accion ='2' THEN 'PREVALIDADO' 
+		   WHEN ob.accion ='3' THEN 'TRANSMITIENDO' 
+		   WHEN ob.accion ='4' THEN 'TRANSMITIDO' 
+		   WHEN ob.accion ='5' THEN 'ENTREGANDO' 
+		   WHEN ob.accion ='6' THEN 'ENTREGADO'  
+		   WHEN ob.accion ='9' THEN 'CANCELADO' 
+		   END AS ESTADO 
+		  FROM 
+		  (SELECT ori.patente,fecha_rec, ori.hora_envio,ori.pedimento, ori.aduana,ori.banco,ori.cve_doc,ori.nm_archivo from reportes.tbl_orig_banc ori WHERE fecha_rec between '2019-12-05' and '2019-12-05') AS ori 
+		  INNER JOIN 
+		  (SELECT   r.patente,r.fec_pago, r.hora, r.nm_archivo, r.banco, r.aduana, r.pedimento, r.rfc, r.cve_error, r.firma, r.hora_pago from reportes.tbl_resp_banc as r WHERE TRUE AND r.fec_pago  between '2019-12-05' and '2019-12-05') r 
+		   ON  (ori.pedimento=r.pedimento) AND (substring(ori.aduana,1,2))=(substring(r.aduana,1,2)) AND ori.banco = r.banco and ori.patente=r.patente 
+		   AND ori.fecha_rec=r.fec_pago  AND substring(ori.nm_archivo,2)=substring(r.nm_archivo,2) 
+		  INNER JOIN 
+		  (SELECT ob.c_asociacion, ob.cv_cliente, ob.nm_archivo, ob.cv_usuario, ob.cv_aduana, ob.cv_patente, ob.cv_banco, ob.nu_pedimentos, ob.fe_envio, ob.hh_envio, ob.hh_recibo, ob.nm_archivo_respuesta, ob.nu_firmas,ob.accion FROM saai.ope_bancos ob where fe_envio='2019-12-05'   " + strCondicion1+ "  AND ob.cv_usuario='ITCE' ) as ob  
+		 ON ob.nm_archivo_respuesta = r.nm_archivo    AND (substring(ob.cv_aduana,1,2)=r.aduana)  
+		 INNER JOIN    
+		 ( SELECT u.c_cliente, u.d_usuario, u.d_nombre, u.d_ape_paterno, u.c_rol AS rol_usuario  FROM saai.cs_usuario u ) u ON (u.d_usuario = ob.cv_usuario)   
+		 INNER JOIN    
+		  (SELECT c.c_asociacion, c.c_cliente, c.d_rfc, c.d_alias, c.d_razon_social FROM saai.cs_cliente c) c ON (u.c_cliente = c.c_cliente)   
+		  INNER JOIN (SELECT a.n_aduanac, a.d_aduana FROM saai.ci_aduana a) a ON (SUBSTRING(a.n_aduanac, 1,2)=SUBSTRING(ob.cv_aduana, 1, 2))  
+		 INNER JOIN (SELECT d_clave_anterior, d_clave, d_clave_anterior as cve_banco, d_nombre as desc_banco  FROM saai.cs_banco b) b ON (b.d_clave_anterior=ob.cv_banco OR b.d_clave=ob.cv_banco)  
+		  UNION  
+		 SELECT ob.c_asociacion, ob.cv_cliente, ob.nm_archivo, ori.pedimento, c.d_rfc, c.d_alias, CONCAT(u.d_usuario, '-', u.d_nombre, ' ', u.d_ape_paterno) as cv_usuario, a.d_aduana, b.desc_banco, r.rfc, ob.nu_pedimentos, ob.fe_envio, ob.hh_envio, r.hora, r.nm_archivo as nm_archivo_respuesta,  r.cve_error, r.firma, 
+		 concat(a.d_aduana,'(',ob.c_asociacion,')') as ciudad, a.n_aduanac,ob.cv_patente , if(r.hora is not null ,sec_to_time(timestampdiff(second,ob.hh_envio,r.hora )) ,'00:00:00' )espera ,ori.cve_doc, ori.pedimento 
+		 ,  CASE 
+		   WHEN ob.accion ='0' THEN 'RECIBIDO' 
+		   WHEN ob.accion ='1' THEN 'PREVALIDANDO' 
+		   WHEN ob.accion ='2' THEN 'PREVALIDADO' 
+		   WHEN ob.accion ='3' THEN 'TRANSMITIENDO'  
+		  WHEN ob.accion ='4' THEN 'TRANSMITIDO' 
+		  WHEN ob.accion ='5' THEN 'ENTREGANDO'  
+		   WHEN ob.accion ='6' THEN 'ENTREGADO' 
+		   WHEN ob.accion ='9' THEN 'CANCELADO'  
+		   END AS ESTADO 
+		  FROM 
+		   (SELECT ori.patente,fecha_rec, ori.hora_envio,ori.pedimento, ori.aduana,ori.banco,ori.cve_doc,ori.nm_archivo from reportes.tbl_orig_banc ori WHERE fecha_rec between '2019-12-05' and '2019-12-05') AS ori 
+		   INNER JOIN 
+		  (SELECT   r.patente,r.fec_pago, r.hora, r.nm_archivo, r.banco, r.aduana, r.pedimento, r.rfc, r.cve_error, r.firma, r.hora_pago from reportes.tbl_resp_banc as r WHERE TRUE AND r.fec_pago  between '2019-12-05' and '2019-12-05') r 
+		   ON  (ori.pedimento=r.pedimento) AND (substring(ori.aduana,1,2))=(substring(r.aduana,1,2)) AND ori.banco = r.banco and ori.patente=r.patente 
+		   AND ori.fecha_rec=r.fec_pago  AND substring(ori.nm_archivo,2)=substring(r.nm_archivo,2) 
+		  INNER JOIN 
+		  (SELECT ob.c_asociacion, ob.cv_cliente, ob.nm_archivo, ob.cv_usuario, ob.cv_aduana, ob.cv_patente, ob.cv_banco, ob.nu_pedimentos, ob.fe_envio, ob.hh_envio, ob.hh_recibo, ob.nm_archivo_respuesta, ob.nu_firmas,ob.accion FROM saai.ope_bancos ob where fe_envio='2019-12-05'    " + strCondicion1+ "     ) as ob 
+		  ON  ob.nm_archivo_respuesta = r.nm_archivo    AND (substring(ob.cv_aduana,1,2)=r.aduana) 
+		 	INNER JOIN  
+		  ( SELECT u.c_cliente, u.d_usuario, u.d_nombre, u.d_ape_paterno, u.c_rol AS rol_usuario FROM saai.cs_usuario u ) u ON (u.d_usuario = ob.cv_usuario) 
+		  INNER JOIN  
+		  (SELECT c.c_asociacion, c.c_cliente, c.d_rfc, c.d_alias, c.d_razon_social FROM saai.cs_cliente c) c ON (u.c_cliente = c.c_cliente) 
+		  INNER JOIN (SELECT a.n_aduanac, a.d_aduana FROM saai.ci_aduana a) a ON (SUBSTRING(a.n_aduanac, 1,2)=SUBSTRING(ob.cv_aduana, 1, 2)) 
+		  INNER JOIN (SELECT d_clave_anterior, d_clave, d_clave_anterior as cve_banco, d_nombre as desc_banco  FROM saai.cs_banco b) b ON (b.d_clave_anterior=ob.cv_banco OR b.d_clave=ob.cv_banco) 
+		  INNER JOIN ( 
+		            SELECT u.c_rol as rol_usuario, su.c_rol as rol_supervisor, su.c_supervisor, su.c_asociacion, su.c_cliente, su.c_usuario, su.c_patente, su.c_aduana FROM saai.cs_supervisores su 
+		             INNER JOIN saai.cs_usuario as u ON su.c_supervisor =u.d_usuario 
+		             WHERE su.b_banco=1 AND su.b_activo=1 AND su.c_supervisor='ITCE'  
+		            ) su 
+		   ON ( su.rol_supervisor = su.rol_usuario 
+		  AND ( su.c_asociacion = ob.c_asociacion OR su.c_asociacion = '*' ) 
+		  AND ( su.c_cliente = ob.cv_cliente OR  su.c_cliente = '*' ) 
+		  AND ( su.c_usuario=ob.cv_usuario OR su.c_usuario = '*' ) 
+		  AND ( su.c_patente = ob.cv_patente OR  su.c_patente = '*'  ) 
+		  AND ( SUBSTRING(su.c_aduana, 1, 2) = SUBSTRING(ob.cv_aduana, 1,2) OR su.c_aduana = '*' ) 
+		   ) 
+		 
+		  ORDER BY hh_envio DESC; 
